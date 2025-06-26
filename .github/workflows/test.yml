@@ -1,0 +1,49 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: CI Tests
+
+on:
+  push:
+
+env:
+  PAO_META: pao-meta.zip # must match what's upoaded in action.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Test Collection
+        id: collect
+        uses: ./collect/
+      - name: Smoke Test Archive
+        env:
+          ARCHIVE: ${{ steps.collect.outputs.archive }}
+          MANIFEST: archive.manifest.txt
+        run: |
+          /bin/ls -l "$ARCHIVE"
+          unzip -l "$ARCHIVE" | tee "$MANIFEST"
+          echo "Scanning for Getting Started guide(s)..."
+          grep -i 'getting started' < "$MANIFEST"
+          echo "Scanning for eBOM(s)..."
+          grep 'eboms/.*\.csv$' < "$MANIFEST"
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.PAO_META }}
+      - name: Verify Attached Artifact
+        env:
+          ARCHIVE: ${{ steps.collect.outputs.archive }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p cmp/build cmp/fetch
+          unzip -d cmp/build "$ARCHIVE"
+          unzip -d cmp/fetch "$PAO_META"
+          # check that the two have the same contents
+          echo "Comparing built and fetched archives' contents"
+          diff -qr cmp/build cmp/fetch

@@ -1,0 +1,36 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO collect"
+author: "HashiCorp"
+description: "Collect PAO-related artifacts for CRT"
+
+branding:
+  color: "blue"
+  icon: "package"
+
+outputs:
+  archive:
+    description: "The generated archive"
+    value: ${{ steps.collect.outputs.archive}}
+
+runs:
+  using: composite
+  steps:
+    - name: Collect Artifacts
+      id: collect
+      shell: bash
+      env:
+        PAO_META: pao-meta.zip
+      run: |
+        tmpdir="$(mktemp -d)"
+        # .. because scripts/ is in repo root and action is in collect/
+        "${GITHUB_ACTION_PATH}/../scripts/collect-meta-artifacts" "$tmpdir" "${{ env.PAO_META }}"
+        unzip -l "${tmpdir}/${PAO_META}"
+        echo "archive=${tmpdir}/${PAO_META}" | tee -a "$GITHUB_OUTPUT"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ env.PAO_META }}
+        path: ${{ steps.collect.outputs.archive }}
+      env:
+        PAO_META: pao-meta.zip
