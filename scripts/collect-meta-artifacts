@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+collect_v1() { local -r basedir="$1" outfile="$2"
+    local -r sourcedir='.release/ibm-pao'
+
+    # input validation
+    if [ -z "$basedir" ]; then
+        err "Invalid working directory specified; consider passing a temp dir."
+    fi
+    if [ -z "$outfile" ]; then
+        err "Invalid output file specified."
+    fi
+    if ! [ -d "$sourcedir" ]; then
+        err "$sourcedir: source directory does not exist"
+    fi
+    if [ "$ERROR_COUNT" -gt 0 ]; then
+        return 1
+    fi
+
+    log "Working directory: $basedir"
+    # Create directory structure from IPS-092.
+    mkdir -p "${basedir}/v1/eboms"
+
+    log "Copying Getting Started guide(s)..."
+    cp -v "${sourcedir}/Getting Started"* "${basedir}/v1/"
+
+    log "Copying eBOM(s)..."
+    cp -v "${sourcedir}/eboms/"*.csv "${basedir}/v1/eboms/"
+
+    (
+        cd "$basedir"
+        zip -q -r "$outfile" .
+    )
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -euo pipefail
+    source "$(dirname "$0")"/utils.bash
+    collect_v1 "$@"
+fi
