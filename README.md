@@ -1,4 +1,4 @@
-# actions-pao-tool [![CI](https://github.com/hashicorp/actions-pao-tool/actions/workflows/test.yml/badge.svg)](https://github.com/hashicorp/actions-pao-tool/actions/workflows/test.yml)
+# actions-pao-tool [![CI](https://github.com/hashicorp-forge/actions-pao-tool/actions/workflows/test.yml/badge.svg)](https://github.com/hashicorp-forge/actions-pao-tool/actions/workflows/test.yml)
 
 _For internal HashiCorp use only. The output of this action is specifically designed to satisfy the needs of our internal deployment system, and may not be useful to other organizations._
 
