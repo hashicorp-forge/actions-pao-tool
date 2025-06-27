@@ -22,10 +22,6 @@ req_files() { local PAO_ZIP="$1"
     return $ERROR_COUNT
 }
 
-# FIXME assume csvkit installed locally
-#   python -m pip install --upgrade pip
-#   pip install csvkit
-#
 # Example of final map (still in CSV)
 # M0RKZML,nomad_1.10.1_linux_s390x.zip
 # M0RL0ML,nomad-1.10.1-1.s390x.rpm
@@ -146,6 +142,10 @@ main() {
         check-ebom-parts)
             shift
             check_ebom_parts "$@"
+            ;;
+        get-part-map)
+            shift
+            extract_part_map "$@"
             ;;
         *)
             err "Unknown command: $1"
