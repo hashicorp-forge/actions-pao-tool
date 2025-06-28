@@ -145,7 +145,7 @@ main() {
             ;;
         get-part-map)
             shift
-            extract_part_map "$@"
+            extract_part_map "$@" 
             ;;
         *)
             err "Unknown command: $1"

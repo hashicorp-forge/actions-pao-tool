@@ -26,20 +26,22 @@ setup_file() {
     assert_failure
 }
 
-@test "ibm-pao_happy-path" {
+
+
+@test "req-files: ibm-pao happy-path" {
     bats_run --separate-stderr -- main req-files "$BATS_TEST_DIRNAME/testdata/happy-path-pao-meta.zip"
     assert_equal "$stderr" ""
     assert_success
 }
 
-@test "ibm-pao_missing-getting-started" {
+@test "req-files: ibm-pao missing Getting Started file" {
     bats_run --separate-stderr -- req_files "$BATS_TEST_DIRNAME/testdata/no-getting-started-pao-meta.zip"
     echo "output: $output"
     assert_equal "$stderr" "[error] File name matching pattern 'Getting Started.*\.pdf' not found in IBM PAO zip artifact."
     assert_failure
 }
 
-@test "ibm-pao_missing-ebom" {
+@test "req-files: ibm-pao missing eBOM" {
     bats_run --separate-stderr -- req_files "$BATS_TEST_DIRNAME/testdata/no-ebom-pao-meta.zip"
     echo "output: $output"
     assert_equal "$stderr" "[error] File name matching pattern 'eboms/.*\.csv' not found in IBM PAO zip artifact."
@@ -113,5 +115,12 @@ setup_file() {
 
 @test "check_ebom_parts: happy path" {
     run check_ebom_parts "$BATS_TEST_DIRNAME/testdata/ebom.good.1.csv" "nomad" "1.10.1"
+    assert_success
+}
+
+@test "get-parts-map: ibm-pao happy-path" {
+    bats_run --separate-stderr -- main get-part-map "$BATS_TEST_DIRNAME/testdata/ebom.good.1.csv"
+    assert_equal "$stderr" ""
+    assert_output "$PART_MAP_1"
     assert_success
 }
