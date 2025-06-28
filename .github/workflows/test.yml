@@ -18,6 +18,25 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Install csvcut
+        run: |
+          python -m pip install --upgrade pip
+          pip install csvkit
+      - name: Install Bats and bats libs
+        id: setup-bats
+        uses: bats-core/bats-action@42fcc8700f773c075a16a90eb11674c0318ad507 # v3.0.1
+        with:
+          support-path: ${{ github.workspace }}/test/bats-support
+          assert-path: ${{ github.workspace }}/test/bats-assert
+          file-path: ${{ github.workspace }}/test/bats-file
+      - name: Run bats tests
+        env:
+          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
+        run: |
+          echo "BATS_LIB_PATH: $BATS_LIB_PATH"
+          bats tests/verify-required-files/verify-required-files.bats
+
       - name: Test Collection
         id: collect
         uses: ./collect/
@@ -47,3 +66,10 @@ jobs:
           # check that the two have the same contents
           echo "Comparing built and fetched archives' contents"
           diff -qr cmp/build cmp/fetch
+
+      - name: Test Verify Required Files
+        uses: ./verify-required-files/
+        with:
+          product: nomad
+          version: 1.10.1
+          pao_meta_file: ${{ steps.collect.outputs.archive }}

@@ -1,0 +1,52 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO: Verify required files"
+author: "HashiCorp"
+description: "Verify that the consuming repository has the required files for PAO"
+
+branding:
+  color: "blue"
+  icon: "package"
+
+inputs:
+  product:
+    description: 'The product name (e.g., "vault", "consul", "nomad")'
+    required: true
+    type: string
+  version:
+    description: 'The product version'
+    required: true
+    type: string
+  pao_meta_file:
+    description: 'The path to the PAO meta file'
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Install csvkit
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install csvkit
+    - name: Validate required files
+      shell: bash
+      # Validate the products to require without requiring all products to have multiple SKUs
+      # Maybe require Vault to have single CSV with all the part numbers?
+      run: |
+        "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh req-files "${{ inputs.pao_meta_file }}" 
+    - name: Validate part number CSV
+      shell: bash
+      env:
+        PRODUCT: ${{ inputs.product }}
+        VERSION: ${{ inputs.version }}
+        PAO_META_FILENAME: ${{ inputs.pao_meta_file }}
+      run: |
+        tmpdir="$(mktemp -d)"
+        unzip "$PAO_META_FILENAME" -d "$tmpdir"
+        # "Validate required files" step already checks for the existence of at least one ebom file
+        for ebom in "${tmpdir}/v1/eboms/"*.csv; do
+          "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh check-ebom-parts "$ebom" "$PRODUCT" "$VERSION" 
+        done
