@@ -14,7 +14,7 @@ setup() {
     bats_load_library bats-support
     bats_load_library bats-assert
 
-    source "xlate"
+    source "${BATS_TEST_DIRNAME}/../scripts/translate-artifact-name.sh"
 }
 
 # Check for disallowed strings; case-insensitive
