@@ -1,0 +1,77 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO: Generate part number map"
+author: "HashiCorp"
+description: "Generate the CSV mapping part numbers to products for PAO releases from a provided eBOM"
+
+branding:
+  color: "blue"
+  icon: "package"
+
+inputs:
+  product:
+    description: 'The product name (e.g., "vault", "consul", "nomad")'
+    required: true
+    type: string
+  version:
+    description: 'The product version'
+    required: true
+    type: string
+  commit_sha:
+    description: 'The commit SHA for the release'
+    required: true
+    type: string
+  pao_meta_file:
+    description: 'The path to the PAO meta file'
+    required: true
+    type: string
+  source_bucket:
+    description: 'The source bucket to download artifacts from'
+    required: true
+    type: string
+  destination_bucket:
+    description: 'The destination bucket to upload artifacts to'
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Install csvkit
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install csvkit 
+    - name: 
+    - name: Generate part number CSV
+      shell: bash
+      env:
+        PRODUCT: ${{ inputs.product }}
+        VERSION: ${{ inputs.version }}
+        COMMIT_SHA: ${{ inputs.commit_sha }}
+        PAO_META_FILENAME: ${{ inputs.pao_meta_file }}
+        SOURCE_BUCKET: ${{ inputs.source_bucket }}
+        DESTINATION_BUCKET: ${{ inputs.destination_bucket }}
+      run: |  
+        tmpdir="$(mktemp -d)"
+        cd "$tmpdir"
+        mkdir in
+        mkdir out
+
+        # Download artifacts from source bucket
+        jfrog rt download  --flat --recursive "$SOURCE_BUCKET/$PRODUCT/$VERSION/$COMMIT_SHA" ./in/
+
+        # Symlink the files in the input directory to part-number filenames in the output directory
+        "{GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
+          "$PAO_META_FILENAME" \
+          in/ \
+          out/ \
+          "{GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh \
+          || {
+            err "Failed to rename files by part number."
+            exit 1
+          }
+
+        # Upload the files
+        jfrog rt upload --flat out/ "$DESTINATION_BUCKET/$PRODUCT/$VERSION/$COMMIT_SHA/"
