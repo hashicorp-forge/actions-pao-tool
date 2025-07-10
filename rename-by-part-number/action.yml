@@ -63,7 +63,7 @@ runs:
         jfrog rt download  --flat --recursive "$SOURCE_BUCKET/$PRODUCT/$VERSION/$COMMIT_SHA" ./in/
 
         # Symlink the files in the input directory to part-number filenames in the output directory
-        "{GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
+        "${GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
           "$PAO_META_FILENAME" \
           in/ \
           out/ \
