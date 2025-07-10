@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 log() { echo "$*" 1>&2 ; }
 
 ERROR_COUNT=0
@@ -18,12 +20,12 @@ rename_by_part_number() { local pao_meta_filename="$1" input_dir="$2" output_dir
             fi
 
             extension="${filename##*.}"
-            if !([ -f "$input_dir/$filename" ]); then
+            if ! [ -f "$input_dir/$filename" ]; then
                 err "File '$filename' does not exist in input directory"
                 continue
             fi
 
-            if !(ln -v "$input_dir/$filename" "$output_dir/$part_number.$extension"); then
+            if ! ln -v "$input_dir/$filename" "$output_dir/$part_number.$extension"; then
                 err "Duplicate part number '$part_number' for file '$filename'."
                 continue
             fi
