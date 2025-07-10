@@ -44,7 +44,7 @@ runs:
         python -m pip install --upgrade pip
         pip install csvkit 
     - name: 
-    - name: Generate part number CSV
+    - name: Rename files by part number
       shell: bash
       env:
         PRODUCT: ${{ inputs.product }}
@@ -64,11 +64,7 @@ runs:
 
         # Name the files in the input directory by part-number in the output directory
         "${GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
-          "$PAO_META_FILENAME" \
-          in/ \
-          out/ \
-          "{GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh \
-          || {
+          "$PAO_META_FILENAME" in/ out/ || {
             err "Failed to rename files by part number."
             exit 1
           }
