@@ -1,0 +1,76 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO Extract Metadata"
+author: "HashiCorp"
+description: "Extract metadata archive created by `collect` action"
+
+branding:
+  color: "blue"
+  icon: "package"
+
+inputs:
+  archive:
+    type: string
+    required: true
+    description: |
+      The metadata archive to extract.
+      This should have been created with the `collect` action.
+  output-dir:
+    type: string
+    description: |
+      Directory in which to extract the archive.
+      After extraction, this will contain paths such as v1/eboms/.
+      See IPS-092 for details.
+
+outputs:
+  output-dir:
+    description: |
+      The directory where the archive was extracted.  If the `output-dir` input
+      is specified, this will have the same value.  Otherwise a location will
+      be generated internally and reported here.
+    value: ${{ steps.extract.outputs.output-dir }}
+
+env:
+  PAO_META: crt-pao-meta.zip # Do not change this value.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      id: setup
+      shell: bash
+      env:
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_ARCHIVE: ${{ inputs.archive }}
+      run: |
+        source "${GITHUB_ACTION_PATH}/../scripts/utils.bash"
+        if [ -z "$INPUT_ARCHIVE" ]; then
+          err "archive: required parameter missing"
+        fi
+        # output-dir allowed to be empty, if so we'll create one below
+
+        echo "output-dir=$INPUT_OUTPUT_DIR" | tee -a "$GITHUB_OUTPUT"
+        echo "archive=$INPUT_ARCHIVE" | tee -a "$GITHUB_OUTPUT"
+
+    - name: Validate Archive
+      shell: bash
+      env:
+        ARCHIVE: ${{ steps.setup.outputs.archive }}
+      run: |
+        "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh req-files "$ARCHIVE"
+
+    - name: Extract Archive
+      id: extract
+      shell: bash
+      env:
+        ARCHIVE: ${{ steps.setup.outputs.archive }}
+        OUTPUT_DIR: ${{ steps.setup.outputs.output-dir }}
+      run: |
+        if [ -z "$OUTPUT_DIR" ]; then
+          # none specified, create one
+          OUTPUT_DIR="$(mktemp -d)"
+        fi
+        echo "output-dir=$OUTPUT_DIR" | tee -a "$GITHUB_OUTPUT"
+
+        unzip "$ARCHIVE" -d "$OUTPUT_DIR"
