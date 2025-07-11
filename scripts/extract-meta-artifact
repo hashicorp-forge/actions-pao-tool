@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# shellcheck source=scripts/utils.bash
+source "${BASH_SOURCE%/*}/utils.bash"
+
+set -euo pipefail
+
+# minimal validation: require v1/ and at least one ebom csv and at least one guide pdf
+validate_contents() { local out_dir="$1"
+    local ERROR_COUNT=0
+    if ! [ -d "${out_dir}/v1" ]; then
+        err "No v1/ directory from archive; archive is invalid."
+        return 1 # no further checks possible
+    fi
+    cnt="$(find "${out_dir}/v1/eboms" -type f -name \*.csv | wc -l)"
+    if [ "$cnt" -lt 1 ]; then
+        err "No CSV documents found in archive; archive is invalid."
+    fi
+    cnt="$(find "${out_dir}/v1" -type f -name \*.pdf | wc -l) "
+    if [ "$cnt" -lt 1 ]; then
+        err "No PDF documents found in archive; archive is invalid."
+    fi
+    return "$ERROR_COUNT"
+}
+
+validate_input() { local archive="$1" out_dir="$2"
+    local ERROR_COUNT=0
+    if [ -z "$archive" ]; then
+        err "No archive specified, nothing to extract."
+    elif ! [ -e "$archive" ]; then
+        err "$archive: archive does not exist."
+    fi
+
+    if [ -z "$out_dir" ]; then
+        err "No output directory specified."
+    else
+        if ! [ -d "$out_dir" ]; then
+            if ! mkdir -p "$out_dir" ; then
+                err "$out_dir: output directory does not exist and could not be created."
+            fi
+        fi
+    fi
+
+    return "$ERROR_COUNT"
+}
+
+main() { local archive="$1" out_dir="$2"
+    validate_input "$archive" "$out_dir"
+    unzip "$archive" -d "$out_dir"
+    validate_contents "$out_dir"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
