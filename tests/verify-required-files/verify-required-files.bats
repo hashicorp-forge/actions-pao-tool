@@ -26,8 +26,6 @@ setup_file() {
     assert_failure
 }
 
-
-
 @test "req-files: ibm-pao happy-path" {
     bats_run --separate-stderr -- main req-files "$BATS_TEST_DIRNAME/testdata/happy-path-pao-meta.zip"
     assert_equal "$stderr" ""
