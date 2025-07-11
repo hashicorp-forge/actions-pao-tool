@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Rename release artifacts to use the short names for PAO eBOMs.
+
+# shellcheck source=scripts/utils.bash
+source "${BASH_SOURCE%/*}/utils.bash"
+
+TRANSLATOR="${BASH_SOURCE%/*}/translate-artifact-name.sh"
+
+set -euo pipefail
+
+# verify input dir exists, output dir exists;
+# try to make output dir if it does not already exist.
+prepare() { local -r IN_DIR="${1:-}" OUT_DIR="${2:-}"
+    local ERROR_COUNT=0
+    if [ -z "$IN_DIR" ]; then
+        err "No input directory specified."
+    elif ! [ -d "$IN_DIR" ]; then
+        err "$IN_DIR: input directory does not exist."
+    fi
+
+    if [ -z "$OUT_DIR" ]; then
+        err "No output directory specified."
+    elif ! [ -d "$OUT_DIR" ]; then
+        if ! mkdir -p "$OUT_DIR" ; then
+            err "$OUT_DIR: output directory does not exist and could not be created."
+        fi
+    fi
+
+    return "$ERROR_COUNT"
+}
+
+translate_names() { local -r IN_DIR="$1" OUT_DIR="$2"
+    local ERROR_COUNT=0 count=0
+    local filename newname
+    while read -r filename ; do
+        newname="$($TRANSLATOR "$filename")"
+        ln -v "${IN_DIR}/$filename" "${OUT_DIR}/$newname"
+        count=$((count + 1))
+    done < <( ls -1 "$IN_DIR/" )
+
+    if [ "$count" -lt 1 ]; then
+        err "No artifacts translated.  Input directory empty?"
+    fi
+    return "$ERROR_COUNT"
+}
+
+main() { local -r IN_DIR="${1:-}" OUT_DIR="${2:-}"
+    prepare "$IN_DIR" "$OUT_DIR"
+    translate_names "$IN_DIR" "$OUT_DIR"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
