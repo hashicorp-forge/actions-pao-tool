@@ -14,14 +14,15 @@ outputs:
     description: "The generated archive"
     value: ${{ steps.collect.outputs.archive}}
 
+env:
+  PAO_META: crt-pao-meta.zip
+
 runs:
   using: composite
   steps:
     - name: Collect Artifacts
       id: collect
       shell: bash
-      env:
-        PAO_META: pao-meta.zip
       run: |
         tmpdir="$(mktemp -d)"
         # .. because scripts/ is in repo root and action is in collect/
@@ -32,5 +33,3 @@ runs:
       with:
         name: ${{ env.PAO_META }}
         path: ${{ steps.collect.outputs.archive }}
-      env:
-        PAO_META: pao-meta.zip
