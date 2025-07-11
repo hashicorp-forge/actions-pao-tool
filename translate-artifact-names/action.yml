@@ -1,0 +1,40 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO Translate Artifact Names to Short Names"
+author: "HashiCorp"
+description: "Translate native artifact names to shortened names suitable for PAO distribution."
+
+branding:
+  color: "blue"
+  icon: "package"
+
+inputs:
+  input-dir:
+    type: string
+    description: |
+      Directory containing artifacts whose names need to be shortened.
+    required: true
+  output-dir:
+    type: string
+    description: |
+      Directory where artifacts are written under their short names.
+    required: true
+
+outputs:
+  output-dir:
+    description: |
+      The output directory where artifacts were stored.
+      It is always the same as the input of the same name.
+    value: ${{ inputs.output-dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Translate
+      shell: bash
+      env:
+        IN_DIR: ${{ inputs.input-dir }}
+        OUT_DIR: ${{ inputs.output-dir }}
+      run: |
+        "${GITHUB_ACTION_PATH}"/../scripts/translate-artifact-names "$IN_DIR" "$OUT_DIR"

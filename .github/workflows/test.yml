@@ -73,3 +73,56 @@ jobs:
           product: nomad
           version: 1.10.1
           pao_meta_file: ${{ steps.collect.outputs.archive }}
+
+  test-translate-short-names:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup
+        id: setup
+        run: |
+          input_dir="$(mktemp -d)"
+          output_dir="$(mktemp -d)"
+          echo "input-dir=$input_dir" | tee -a "$GITHUB_OUTPUT"
+          echo "output-dir=$output_dir" | tee -a "$GITHUB_OUTPUT"
+
+          cd tests/translate-artifact-names/testdata/input/happy-path
+          cp -v ./* "${input_dir}/"
+
+          test -d "$output_dir" # verify the directory was created
+
+      - name: Translate
+        uses: ./translate-artifact-names
+        with:
+          input-dir: ${{ steps.setup.outputs.input-dir }}
+          output-dir: ${{ steps.setup.outputs.output-dir }}
+
+      # Check that we have the same number of artifacts in both dirs and than no artifact (name) is in both.
+      # This is a bit crude, but:
+      #   * it avoids duplicating the translation exactly (which masks bugs in the translator)
+      #   * it avoids making the test brittle by hardcoding things
+      - name: Verification
+        env:
+          IN_DIR: ${{ steps.setup.outputs.input-dir }}
+          OUT_DIR: ${{ steps.setup.outputs.output-dir }}
+        run: |
+          source scripts/utils.bash
+
+          echo "$IN_DIR"
+          find "$IN_DIR/"
+
+          echo "$OUT_DIR"
+          find "$OUT_DIR/"
+
+          count_in="$(find "$IN_DIR/" -printf '.' | wc -l | xargs)"
+          count_out="$(find "$OUT_DIR/" -printf '.' | wc -l | xargs)"
+          if [ "$count_in" -ne "$count_out" ]; then
+            err "Have $count_in input artifacts; expected same number output but instead got $count_out."
+          fi
+
+          # shellcheck disable=SC2012
+          while read -r filename; do
+            if [ -e "${OUT_DIR}/$filename" ]; then
+              err "$filename: found artifact with same name in both input and output directories."
+            fi
+          done < <(ls -1 "$IN_DIR/")
