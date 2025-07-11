@@ -21,7 +21,7 @@ runs:
       id: collect
       shell: bash
       env:
-        PAO_META: pao-meta.zip
+        PAO_META: crt-pao-meta.zip
       run: |
         tmpdir="$(mktemp -d)"
         # .. because scripts/ is in repo root and action is in collect/
@@ -29,8 +29,8 @@ runs:
         unzip -l "${tmpdir}/${PAO_META}"
         echo "archive=${tmpdir}/${PAO_META}" | tee -a "$GITHUB_OUTPUT"
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      env:
+        PAO_META: crt-pao-meta.zip
       with:
         name: ${{ env.PAO_META }}
         path: ${{ steps.collect.outputs.archive }}
-      env:
-        PAO_META: pao-meta.zip

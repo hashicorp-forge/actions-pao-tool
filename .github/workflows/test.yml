@@ -7,7 +7,7 @@ on:
   push:
 
 env:
-  PAO_META: pao-meta.zip # must match what's upoaded in action.yml
+  PAO_META: crt-pao-meta.zip # must match what's upoaded in action.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
