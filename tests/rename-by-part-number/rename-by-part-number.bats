@@ -18,10 +18,9 @@ setup() {
 
 @test "happy-path" {
     tempdir="$(mktemp -d)"
-    bats_run --separate-stderr -- main "$BATS_TEST_DIRNAME/testdata/pao-metadata-files/happy-path.zip" \
+    bats_run --separate-stderr -- main "$BATS_TEST_DIRNAME/testdata/pao-metadata-files/happy-path" \
         "$BATS_TEST_DIRNAME/testdata/input-happy-path" \
-        "$tempdir" \
-        "$BATS_TEST_DIRNAME/../../scripts/verify-required-files.sh"
+        "$tempdir" 
     assert_equal "$stderr" ""
     assert [ -f "$tempdir/MOOCOWA.zip" ]
     assert [ -f "$tempdir/MOOCOWB.zip" ]
@@ -30,10 +29,9 @@ setup() {
 
 @test "multiple eboms" {
     tempdir="$(mktemp -d)"
-    bats_run --separate-stderr -- main "$BATS_TEST_DIRNAME/testdata/pao-metadata-files/multiple-eboms.zip" \
+    bats_run --separate-stderr -- main "$BATS_TEST_DIRNAME/testdata/pao-metadata-files/multiple-eboms" \
         "$BATS_TEST_DIRNAME/testdata/input-happy-path" \
-        "$tempdir" \
-        "$BATS_TEST_DIRNAME/../../scripts/verify-required-files.sh"
+        "$tempdir" 
     assert_equal "$stderr" ""
     assert [ -f "$tempdir/MOOCOWA.zip" ]
     assert [ -f "$tempdir/MOOCOWB.zip" ]

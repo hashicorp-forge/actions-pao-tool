@@ -22,8 +22,8 @@ inputs:
     description: 'The commit SHA for the release'
     required: true
     type: string
-  pao_meta_file:
-    description: 'The path to the PAO meta file'
+  pao_meta_dir:
+    description: 'The path to the PAO meta directory'
     required: true
     type: string
   source_bucket:
@@ -50,7 +50,7 @@ runs:
         PRODUCT: ${{ inputs.product }}
         VERSION: ${{ inputs.version }}
         COMMIT_SHA: ${{ inputs.commit_sha }}
-        PAO_META_FILENAME: ${{ inputs.pao_meta_file }}
+        PAO_META_DIR: ${{ inputs.pao_meta_dir }}
         SOURCE_BUCKET: ${{ inputs.source_bucket }}
         DESTINATION_BUCKET: ${{ inputs.destination_bucket }}
       run: |  
@@ -64,7 +64,7 @@ runs:
 
         # Name the files in the input directory by part-number in the output directory
         "${GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
-          "$PAO_META_FILENAME" in/ out/ || {
+          "$PAO_META_DIR" in/ out/ || {
             err "Failed to rename files by part number."
             exit 1
           }
