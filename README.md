@@ -6,7 +6,7 @@ Tools related to release channel PAO.
 
 ## Usage
 
-To create the `pao-meta.zip` artifact containing (CSV) eBOMs, the Getting Started guide, etc.:
+To create the `crt-pao-meta.zip` artifact containing (CSV) eBOMs, the Getting Started guide, etc.:
 
 ```yaml
 steps:
