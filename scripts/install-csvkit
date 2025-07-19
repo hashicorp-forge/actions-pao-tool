@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+    # no-op if already installed
+    if csvcut --version 2>/dev/null ; then
+        exit 0
+    fi
+
+    sudo apt update
+    sudo apt install -y python3 python3-pip </dev/null
+
+    param=
+    if pip install --help |& grep break-system-packages >/dev/null ; then
+        param='--break-system-packages'
+    fi
+    pip install $param csvkit
+
+    # hint at what we got
+    export PATH="$HOME/.local/bin:$PATH"
+    echo "PATH=$PATH" >> "$GITHUB_ENV"
+    csvcut --version
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
+
+#  vim: set ts=4 sw=4 tw=0 et :
