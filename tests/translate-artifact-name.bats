@@ -157,6 +157,8 @@ ALL_PRODUCTS=(
     "consul_1.20.4+ent_solaris_amd64.zip"
     "consul_1.20.4+ent_windows_386.zip"
     "consul_1.20.4+ent_windows_amd64.zip"
+    "crt-core-helloworld-enterprise-1.0.0+ent.fips1403-1.x86_64.rpm"
+    "crt-core-helloworld-enterprise-1.0.0+ent.fips1403-1.aarch64.rpm"
     "nomad-enterprise-1.9.6+ent-1.aarch64.rpm"
     "nomad-enterprise-1.9.6+ent-1.s390x.rpm"
     "nomad-enterprise-1.9.6+ent-1.x86_64.rpm"

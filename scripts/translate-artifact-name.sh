@@ -17,6 +17,7 @@ xlate() {
     repl="${repl/-fips1403/-F3}" # fips1403 for linux packages
     repl="${repl/-H-F3/-HF3}" # hsm+fips for linux packages
     repl="${repl/terraform-enterprise/tfe}"
+    repl="${repl/crt-core-}" # strip crt-core- prefix for testing with helloworld
     repl="${repl/_production_/_}" # TFE puts 'production' in tarball names -- remove to shorten the name
     repl="${repl/-enterprise}" # consul-enterprise -> consul
     repl="${repl/_release_/_}" # nomad docker images have 'release' in their names
@@ -39,6 +40,14 @@ xlate() {
             repl="${repl/_H}"
             ;;
     esac
+
+    # Remove PAO target from docker images
+    case "$repl" in
+        *_release-ibm-pao_*.tar)
+            repl="${repl/release-ibm-pao_}"
+            ;;
+    esac
+
     # move F2 embedded in version string to be a suffix of the product name (preceding the version string)
     case "$repl" in
         *_F2-*.rpm)
