@@ -51,7 +51,7 @@ xlate() {
     # move F2 embedded in version string to be a suffix of the product name (preceding the version string)
     case "$repl" in
         *_F2-*.rpm)
-            repl="${repl%%_*}-F2-${repl#*-}"
+            repl="${repl%%-*}-F2-${repl#*-}"
             repl="${repl/_F2-/-}"
             ;;
         *-F2-*.rpm)
@@ -63,7 +63,7 @@ xlate() {
             repl="${repl/_F2-/-}"
             ;;
         *_F3-*.rpm)
-            repl="${repl%%_*}-F3-${repl#*-}"
+            repl="${repl%%-*}-F3-${repl#*-}"
             repl="${repl/_F3-/-}"
             ;;
         *-F3-*.rpm)
