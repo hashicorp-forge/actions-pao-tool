@@ -1,0 +1,17 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO Install CSVKit"
+author: "HashiCorp"
+description: "Install the csvkit tools used by actions-pao-tool"
+
+branding:
+  color: "blue"
+  icon: "package"
+
+runs:
+  using: composite
+  steps:
+    - name: Install csvcut
+      shell: bash
+      run: "${GITHUB_ACTION_PATH}/../scripts/install-csvkit"

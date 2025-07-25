@@ -40,10 +40,7 @@ runs:
   steps:
     - name: Install csvkit
       shell: bash
-      run: |
-        python -m pip install --upgrade pip
-        pip install csvkit 
-    - name: 
+      run: "${GITHUB_ACTION_PATH}/../scripts/install-csvkit"
     - name: Rename files by part number
       shell: bash
       env:
