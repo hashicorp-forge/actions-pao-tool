@@ -200,3 +200,5 @@ jobs:
               err "$filename: found artifact with same name in both input and output directories."
             fi
           done < <(ls -1 "$IN_DIR/")
+
+          exit "$ERROR_COUNT"
