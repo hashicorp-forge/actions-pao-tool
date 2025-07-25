@@ -1,9 +1,9 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-name: "PAO: Generate part number map"
+name: "PAO: Rename Artifacts by Part Number"
 author: "HashiCorp"
-description: "Generate the CSV mapping part numbers to products for PAO releases from a provided eBOM"
+description: "Rename artifacts by part number as found in the PAO metadata artifact"
 
 branding:
   color: "blue"
