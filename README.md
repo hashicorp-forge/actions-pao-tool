@@ -2,15 +2,13 @@
 
 _For internal HashiCorp use only. The output of this action is specifically designed to satisfy the needs of our internal deployment system, and may not be useful to other organizations._
 
+This repository contains a handful of actions related to the PAO release channel.
+Refer to the documentation of action for usage.
+
 Tools related to release channel PAO.
 
-## Usage
+### Release Process
 
-To create the `crt-pao-meta.zip` artifact containing (CSV) eBOMs, the Getting Started guide, etc.:
-
-```yaml
-steps:
-  # ...
-  - uses: actions/checkout@latest # ...
-  - uses: hashicorp-forge/actions-pao-tool/collect@v1 # ...
-```
+1. Create a new tag at the commit to release.
+   Follow SemVer semantics.
+1. Update dynamic tags (e.g. `v1`) to match the most recent release.
