@@ -39,6 +39,6 @@ runs:
         # Name the files in the input directory by part-number in the output directory
         "${GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
           "$PAO_META_DIR" "$INPUT_DIR" "$OUTPUT_DIR" || {
-            err "Failed to rename files by part number."
+            echo "Failed to rename files by part number." 1>&2
             exit 1
           }
