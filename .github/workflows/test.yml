@@ -161,6 +161,7 @@ jobs:
           pao_meta_dir="$(mktemp -d)"
           echo "input-dir=$input_dir" | tee -a "$GITHUB_OUTPUT"
           echo "output-dir=$output_dir" | tee -a "$GITHUB_OUTPUT"
+          echo "pao-meta-dir=$pao_meta_dir" | tee -a "$GITHUB_OUTPUT"
 
           cd tests/rename-by-part-number/testdata/input-happy-path
           cp -v ./* "${input_dir}/"
