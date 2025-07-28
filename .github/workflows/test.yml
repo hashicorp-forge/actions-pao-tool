@@ -173,9 +173,6 @@ jobs:
       - name: Rename by Part Number
         uses: ./rename-by-part-number/
         with:
-          product: nomad
-          version: 1.10.1
-          commit_sha: 0123456789abcdef0123456789abcdef01234567
           pao_meta_dir: ${{ steps.setup-part-number-rename.outputs.pao-meta-dir }}
           input_dir: ${{ steps.setup-part-number-rename.outputs.input-dir }}
           output_dir: ${{ steps.setup-part-number-rename.outputs.output-dir }}

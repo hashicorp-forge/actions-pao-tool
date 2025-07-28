@@ -10,18 +10,6 @@ branding:
   icon: "package"
 
 inputs:
-  product:
-    description: 'The product name (e.g., "vault", "consul", "nomad")'
-    required: true
-    type: string
-  version:
-    description: 'The product version'
-    required: true
-    type: string
-  commit_sha:
-    description: 'The commit SHA for the release'
-    required: true
-    type: string
   pao_meta_dir:
     description: 'The path to the PAO meta directory'
     required: true
@@ -44,12 +32,7 @@ runs:
     - name: Rename files by part number
       shell: bash
       env:
-        PRODUCT: ${{ inputs.product }}
-        VERSION: ${{ inputs.version }}
-        COMMIT_SHA: ${{ inputs.commit_sha }}
         PAO_META_DIR: ${{ inputs.pao_meta_dir }}
-        SOURCE_BUCKET: ${{ inputs.source_bucket }}
-        DESTINATION_BUCKET: ${{ inputs.destination_bucket }}
         INPUT_DIR: ${{ inputs.input_dir }}
         OUTPUT_DIR: ${{ inputs.output_dir }}
       run: |  

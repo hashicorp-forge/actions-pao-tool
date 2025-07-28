@@ -7,8 +7,9 @@ ERROR_TOTAL=0
 err() { log "[error] $*" ; ERROR_COUNT=$((ERROR_COUNT + 1)) ; }
 
 rename_by_part_number() { local pao_dir="$1" input_dir="$2" output_dir="$3" 
-    
+
     for ebom in "$pao_dir/v1/eboms/"*.csv; do
+        echo "Processing ebom: $ebom"
         "${BASH_SOURCE%/*}/verify-required-files.sh" get-part-map "$ebom" > part-map.csv
 
         # Link the files to their new filenames
