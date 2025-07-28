@@ -167,6 +167,7 @@ jobs:
 
           cd ../pao-metadata-files/happy-path
           cp -rv ./* "${pao_meta_dir}/"
+          echo "PAO directory contents: \n$(ls -lR "${pao_meta_dir}/")"
 
           test -d "$output_dir" # verify the directory was created
       - name: Rename by Part Number
