@@ -147,6 +147,68 @@ jobs:
           OUTPUT_DIR: ${{ steps.extract2.outputs.output-dir }}
         run: |
           find "$OUTPUT_DIR"
+  
+  test-rename-by-part-number:
+    runs-on: "ubuntu-latest"
+    needs: [install-csvkit]
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup
+        id: setup-part-number-rename
+        run: |
+          input_dir="$(mktemp -d)"
+          output_dir="$(mktemp -d)"
+          pao_meta_dir="$(mktemp -d)"
+          echo "input-dir=$input_dir" | tee -a "$GITHUB_OUTPUT"
+          echo "output-dir=$output_dir" | tee -a "$GITHUB_OUTPUT"
+
+          cd tests/rename-by-part-number/testdata/input-happy-path
+          cp -v ./* "${input_dir}/"
+
+          cd ../pao-metadata-files/happy-path
+          cp -rv ./* "${pao_meta_dir}/"
+
+          test -d "$output_dir" # verify the directory was created
+      - name: Rename by Part Number
+        uses: ./rename-by-part-number/
+        with:
+          product: nomad
+          version: 1.10.1
+          commit_sha: 0123456789abcdef0123456789abcdef01234567
+          pao_meta_dir: ${{ steps.setup-part-number-rename.outputs.pao-meta-dir }}
+          input_dir: ${{ steps.setup-part-number-rename.outputs.input-dir }}
+          output_dir: ${{ steps.setup-part-number-rename.outputs.output-dir }}
+      - name: Verify Renamed Artifacts
+        env:
+          IN_DIR: ${{ steps.setup-part-number-rename.outputs.input-dir }}
+          OUT_DIR: ${{ steps.setup-part-number-rename.outputs.output-dir }}
+        run: |
+          source scripts/utils.bash
+
+          echo "$IN_DIR"
+          find "$IN_DIR/"
+
+          echo "$OUT_DIR"
+          find "$OUT_DIR/"
+
+          count_in="$(find "$IN_DIR/" -printf '.' | wc -l | xargs)"
+          count_out="$(find "$OUT_DIR/" -printf '.' | wc -l | xargs)"
+          if [ "$count_in" -ne "$count_out" ]; then
+            err "Have $count_in input artifacts; expected same number output but instead got $count_out."
+          fi
+
+          # shellcheck disable=SC2012
+          while read -r filename; do
+            if [ -e "${OUT_DIR}/$filename" ]; then
+              err "$filename: found artifact with same name in both input and output directories."
+            fi
+          done < <(ls -1 "$IN_DIR/")
+
+          # spotcheck specific filename from eBOM
+          if ! [ -e "${OUT_DIR}/MOOCOWA.zip" ]; then
+            err "Expected MOOCOWA.zip in output directory."
+          fi
+          exit "$ERROR_COUNT"
 
   test-translate-short-names:
     runs-on: "ubuntu-latest"
