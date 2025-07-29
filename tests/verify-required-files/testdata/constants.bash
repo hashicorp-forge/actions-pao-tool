@@ -20,6 +20,20 @@ MOOCOW2,nomad-1.10.1-1.s390x.rpm
 MOOCOW3,nomad_1.10.1-1_s390x.deb
 MOOCOW4,Getting Started with IBM Nomad for Z.pdf'
 
+# PART_MAP_3 matches ebom.crt-core-helloworld.csv
+export PART_MAP_3='MOOCOWA,helloworld_1.10.1_darwin_amd64.zip
+MOOCOWB,helloworld_1.10.1_darwin_arm64.zip
+MOOCOWC,helloworld_1.10.1_linux_amd64.zip
+MOOCOWD,helloworld_1.10.1_linux_arm64.zip
+MOOCOWE,helloworld_1.10.1_windows_amd64.zip
+MOOCOWF,helloworld_linux_amd64_1.10.1.tar
+MOOCOWG,helloworld_linux_arm64_1.10.1.tar
+MOOCOWH,helloworld_1.10.1-1_arm64.deb
+MOOCOWI,helloworld_1.10.1-1_amd64.deb
+MOOCOWJ,helloworld-1.10.1-1.aarch64.rpm
+MOOCOWK,helloworld-1.10.1-1.x86_64.rpm
+MOOCOWL,Getting Started with IBM Nomad.pdf'
+
 export PART_MAP_NO_GUIDE='M0RKZML,nomad_1.10.1_linux_s390x.zip
 M0RL0ML,nomad-1.10.1-1.s390x.rpm
 M0RL1ML,nomad_1.10.1-1_s390x.deb'

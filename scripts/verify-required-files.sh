@@ -46,14 +46,24 @@ extract_part_map() { local file_path="$1"
     printf "%s\n" "$entries"
 }
 
+# Returns the short name for a product based on its long name.
+# Most products will not have a special short name, 
+# so the default is to return the input
+product_to_short_name() {
+  case "$1" in
+    crt-core-helloworld) echo "helloworld" ;;
+    # add more mappings here; 
+    # the translate-artifact-names.sh script produces the short names
+    # and will need replacement rules that produce the same short names
+    *) echo "$1" ;;  # default: return input if no mapping
+  esac
+}
+
 ck_has_name_version() { local map="$1" product="$2" version="$3"
     local ERROR_COUNT=0
     local parts
 
-    if [[ -z "$product" || -z "$version" ]]; then
-        err "Product name and version must be provided."
-        return $ERROR_COUNT
-    fi
+    product=$(product_to_short_name "$product")
 
     # Extract file names
     # example:
@@ -62,6 +72,13 @@ ck_has_name_version() { local map="$1" product="$2" version="$3"
     # nomad_1.10.1-1_s390x.deb
     # Getting Started with IBM Nomad for Z.pdf
     parts="$( csvcut -c 2 <<<"$map" )"
+
+    # Products with a long name may have a short name version
+    # This avoids overly long filenames for IBM's systems
+    # if [[ -v product_to_short_name_map["$product"] ]]; then
+    #     product="${product_to_short_name_map[$product]}"
+    # fi
+
     while read -r fname ; do
         if grep "$product" <<<"$fname" >/dev/null && grep -F "$version" <<<"$fname" >/dev/null ; then
             # found a match, test passed

@@ -100,6 +100,12 @@ setup_file() {
     assert_failure
 }
 
+@test "name and version: product with special-case short name" {
+    # PART_MAP_3 is for crt-core-helloworld 1.10.1
+    run ck_has_name_version "$PART_MAP_3" "crt-core-helloworld" "1.10.1"
+    assert_success
+}
+
 @test "getting started guide: present" {
     run ck_has_guide "$PART_MAP_1"
     assert_success
