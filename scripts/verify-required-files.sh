@@ -73,12 +73,6 @@ ck_has_name_version() { local map="$1" product="$2" version="$3"
     # Getting Started with IBM Nomad for Z.pdf
     parts="$( csvcut -c 2 <<<"$map" )"
 
-    # Products with a long name may have a short name version
-    # This avoids overly long filenames for IBM's systems
-    # if [[ -v product_to_short_name_map["$product"] ]]; then
-    #     product="${product_to_short_name_map[$product]}"
-    # fi
-
     while read -r fname ; do
         if grep "$product" <<<"$fname" >/dev/null && grep -F "$version" <<<"$fname" >/dev/null ; then
             # found a match, test passed
