@@ -50,10 +50,7 @@ ck_has_name_version() { local map="$1" product="$2" version="$3"
     local ERROR_COUNT=0
     local parts
 
-    if [[ -z "$product" || -z "$version" ]]; then
-        err "Product name and version must be provided."
-        return $ERROR_COUNT
-    fi
+    product=$("${BASH_SOURCE%/*}/translate-artifact-name.sh" "$product")
 
     # Extract file names
     # example:
@@ -62,6 +59,7 @@ ck_has_name_version() { local map="$1" product="$2" version="$3"
     # nomad_1.10.1-1_s390x.deb
     # Getting Started with IBM Nomad for Z.pdf
     parts="$( csvcut -c 2 <<<"$map" )"
+
     while read -r fname ; do
         if grep "$product" <<<"$fname" >/dev/null && grep -F "$version" <<<"$fname" >/dev/null ; then
             # found a match, test passed
