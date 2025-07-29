@@ -46,24 +46,11 @@ extract_part_map() { local file_path="$1"
     printf "%s\n" "$entries"
 }
 
-# Returns the short name for a product based on its long name.
-# Most products will not have a special short name, 
-# so the default is to return the input
-product_to_short_name() {
-  case "$1" in
-    crt-core-helloworld) echo "helloworld" ;;
-    # add more mappings here; 
-    # the translate-artifact-names.sh script produces the short names
-    # and will need replacement rules that produce the same short names
-    *) echo "$1" ;;  # default: return input if no mapping
-  esac
-}
-
 ck_has_name_version() { local map="$1" product="$2" version="$3"
     local ERROR_COUNT=0
     local parts
 
-    product=$(product_to_short_name "$product")
+    product=$("${BASH_SOURCE%/*}/translate-artifact-name.sh" "$product")
 
     # Extract file names
     # example:
