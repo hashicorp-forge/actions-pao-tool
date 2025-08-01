@@ -3,35 +3,23 @@
 
 name: "PAO: Rename Artifacts by Part Number"
 author: "HashiCorp"
-description: "Rename artifacts by part number as found in the PAO metadata artifact"
+description: "Rename artifacts by CSV mapping part numbers from eBOMs in a provided meta directory for PAO releases"
 
 branding:
   color: "blue"
   icon: "package"
 
 inputs:
-  product:
-    description: 'The product name (e.g., "vault", "consul", "nomad")'
-    required: true
-    type: string
-  version:
-    description: 'The product version'
-    required: true
-    type: string
-  commit_sha:
-    description: 'The commit SHA for the release'
-    required: true
-    type: string
   pao_meta_dir:
     description: 'The path to the PAO meta directory'
     required: true
     type: string
-  source_bucket:
-    description: 'The source bucket to download artifacts from'
+  input_dir:
+    description: 'The input directory containing the artifacts to rename'
     required: true
     type: string
-  destination_bucket:
-    description: 'The destination bucket to upload artifacts to'
+  output_dir:
+    description: 'The output directory containing the renamed artifacts'
     required: true
     type: string
 
@@ -44,27 +32,13 @@ runs:
     - name: Rename files by part number
       shell: bash
       env:
-        PRODUCT: ${{ inputs.product }}
-        VERSION: ${{ inputs.version }}
-        COMMIT_SHA: ${{ inputs.commit_sha }}
         PAO_META_DIR: ${{ inputs.pao_meta_dir }}
-        SOURCE_BUCKET: ${{ inputs.source_bucket }}
-        DESTINATION_BUCKET: ${{ inputs.destination_bucket }}
+        INPUT_DIR: ${{ inputs.input_dir }}
+        OUTPUT_DIR: ${{ inputs.output_dir }}
       run: |  
-        tmpdir="$(mktemp -d)"
-        cd "$tmpdir"
-        mkdir in
-        mkdir out
-
-        # Download artifacts from source bucket
-        jfrog rt download  --flat --recursive "$SOURCE_BUCKET/$PRODUCT/$VERSION/$COMMIT_SHA" ./in/
-
         # Name the files in the input directory by part-number in the output directory
         "${GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
-          "$PAO_META_DIR" in/ out/ || {
-            err "Failed to rename files by part number."
+          "$PAO_META_DIR" "$INPUT_DIR" "$OUTPUT_DIR" || {
+            echo "Failed to rename files by part number." 1>&2
             exit 1
           }
-
-        # Upload the files
-        jfrog rt upload --flat out/ "$DESTINATION_BUCKET/$PRODUCT/$VERSION/$COMMIT_SHA/"
