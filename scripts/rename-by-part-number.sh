@@ -18,13 +18,20 @@ rename_by_part_number() { local pao_dir="$1" input_dir="$2" output_dir="$3"
                 continue
             fi
 
+            filesource_dir=$input_dir
+
+            if [[ "$filename" == "Getting Started"* ]]; then
+                # This is a Getting Started guide, which comes from the PAO metadata
+                filesource_dir="$pao_dir"/v1
+            fi
+
             extension="${filename##*.}"
-            if ! [ -f "$input_dir/$filename" ]; then
-                err "File '$filename' does not exist in input directory"
+            if ! [ -f "$filesource_dir/$filename" ]; then
+                err "File '$filename' does not exist in directory $filesource_dir"
                 continue
             fi
 
-            if ! ln -v "$input_dir/$filename" "$output_dir/$part_number.$extension"; then
+            if ! ln -v "$filesource_dir/$filename" "$output_dir/$part_number.$extension"; then
                 err "Duplicate part number '$part_number' for file '$filename'."
                 continue
             fi

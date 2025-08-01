@@ -24,6 +24,7 @@ setup() {
     assert_equal "$stderr" ""
     assert [ -f "$tempdir/MOOCOWA.zip" ]
     assert [ -f "$tempdir/MOOCOWB.zip" ]
+    assert [ -f "$tempdir/MOOCOWC.pdf" ]
     assert_success
 }
 
