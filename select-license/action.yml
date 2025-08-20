@@ -1,0 +1,43 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: "PAO: Select License"
+author: "HashiCorp"
+description: |
+  This action selects a license (directory name) based on a target architecture,
+  which should be `amd64`, `arm64`, `s390x`, etc.  Some architectures require
+  specific licenses, e.g. `s390x` (`Z`).  If a license directory is found matching
+  the architecture name, it will be used, otherwise `default` will be selected.
+
+  Note that s390x *always* uses `s390x`, but the license documents are this architecture
+  are always different from the default.
+
+  Note for Terraform Enterprise: because TFE for Z is itself an amd64 image but can be
+  bundled with the Z license for use in managing s390x hosts, the architecture should
+  be set to s390x for that use case.
+
+branding:
+  color: "blue"
+  icon: "package"
+
+inputs:
+  arch:
+    description: "The target architecture: amd64, arm64, s390x, etc."
+    required: true
+
+outputs:
+  license-path:
+    description: "The path to the selected license documents"
+    value: ${{ steps.select-license.outputs.license-path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Select License
+      id: select-license
+      shell: bash
+      env:
+        TARGET_ARCH: ${{ inputs.arch }}
+      run: |
+        license_path="$("${GITHUB_ACTION_PATH}/../scripts/select-license" "$TARGET_ARCH")"
+        echo "license-path=$license_path" | tee -a "$GITHUB_OUTPUT"

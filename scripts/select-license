@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# shellcheck disable=SC1091
+source "${BASH_SOURCE%/*}/utils.bash"
+
+DEFAULT_LICENSE_BASE_DIR='.release/ibm-pao/license'
+
+main() {
+    local TARGET_ARCH="${1:-}"
+    local LICENSE_BASE_DIR=${2:-$DEFAULT_LICENSE_BASE_DIR}
+
+    log "LICENSE_BASE_DIR is $LICENSE_BASE_DIR"
+    if [ -z "$TARGET_ARCH" ]; then
+        die 'No architecture specified.  The "arch" parameter must be set.'
+    fi
+
+    LICENSE_DIR="default"
+    if [ "$TARGET_ARCH" = 's390x' ]; then
+        # Special case for s390x/Z -- always has separate license docs.
+        LICENSE_DIR='s390x'
+    elif [ -d "${LICENSE_BASE_DIR}/${TARGET_ARCH}" ]; then
+        log "Overriding default license for arch $TARGET_ARCH"
+        LICENSE_DIR="${TARGET_ARCH}"
+    fi
+    LICENSE_DIR="${LICENSE_BASE_DIR}/${LICENSE_DIR}"
+
+    log "TARGET_ARCH: $TARGET_ARCH"
+    log "LICENSE_DIR: $LICENSE_DIR"
+
+    if ! [ -d "$LICENSE_DIR" ]; then
+        die "$LICENSE_DIR-- license directory missing.  Do you need to checkout your repository first?"
+    fi
+
+    echo "$LICENSE_DIR"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

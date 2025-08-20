@@ -147,7 +147,7 @@ jobs:
           OUTPUT_DIR: ${{ steps.extract2.outputs.output-dir }}
         run: |
           find "$OUTPUT_DIR"
-  
+
   test-rename-by-part-number:
     runs-on: "ubuntu-latest"
     needs: [install-csvkit]
@@ -263,3 +263,30 @@ jobs:
           done < <(ls -1 "$IN_DIR/")
 
           exit "$ERROR_COUNT"
+
+  select-license:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup
+        id: setup
+        env:
+          LICENSE_BASE_DIR: .release/ibm-pao/license
+        run: |
+          mkdir -p "${LICENSE_BASE_DIR}/default/Softcopy"
+
+      - name: Select License
+        id: select-license
+        uses: ./select-license
+        with:
+          arch: "amd64"
+
+      - name: Verify
+        env:
+          LICENSE_PATH: ${{ steps.select-license.outputs.license-path }}
+        run: |
+          source scripts/utils.bash
+
+          if ! [ -d "${LICENSE_PATH}/Softcopy" ]; then
+            die "::error::${LICENSE_PATH}/Softcopy: selected license path does not exist!"
+          fi
