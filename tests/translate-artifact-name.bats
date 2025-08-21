@@ -8,8 +8,6 @@ bats_require_minimum_version 1.7.0
 # This must be in the current shell, so it cannot be within a bats setup* function.
 eval "$(echo -n 'bats_run()' ; declare -f run | tail -n +2)"
 
-readonly MAX_LENGTH=40
-
 setup() {
     bats_load_library bats-support
     bats_load_library bats-assert
@@ -30,21 +28,15 @@ assert_string_absent() {
 @test "all products translation" {
     local product
     for product in "${ALL_PRODUCTS[@]}" ; do
-        output="$(xlate "$product")"
+        unset output
+        bats_run -- xlate "$product"
         #echo "xlate: [$product] -> [$output]" 1>&3
-        echo "$output" 1>&3
+
         assert_string_absent "terraform-enterprise" "$output"
         assert_string_absent "fips" "$output"
         assert_string_absent "hsm" "$output"
         assert_string_absent "+ent" "$output"
-    done
-}
-
-@test "all products length" {
-    local product
-    for product in "${ALL_PRODUCTS[@]}" ; do
-        output="$(xlate "$product")"
-        assert [ "${#output}" -le $MAX_LENGTH ]
+        assert_success
     done
 }
 

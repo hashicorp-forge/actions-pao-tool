@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+# MAX_LENGTH is the maximum length of the file name allowed by Tequila, including any extension.
+# Over-length names yield errors.
+readonly MAX_LENGTH=40
+
 xlate() {
     local name="$1" repl=""
     repl="$name"
@@ -75,6 +81,11 @@ xlate() {
             repl="${repl/_F3-/-}"
             ;;
     esac
+
+    if [ "${#repl}" -gt 40 ]; then
+        echo "${repl}: translated name is ${#repl} characters, maximum allowed is ${MAX_LENGTH}." 1>&2
+        return 1
+    fi
 
     echo "$repl"
 }
