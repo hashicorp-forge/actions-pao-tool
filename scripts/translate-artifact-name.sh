@@ -26,8 +26,8 @@ xlate() {
     repl="${repl/crt-core-}" # strip crt-core- prefix for testing with helloworld
     repl="${repl/_production_/_}" # TFE puts 'production' in tarball names -- remove to shorten the name
     repl="${repl/-enterprise}" # consul-enterprise -> consul
-    repl="${repl/_release_/_}" # nomad docker images have 'release' in their names
-    repl="${repl/_default[-_]/_}" # consul and vault docker images have 'default' in their names
+    repl="${repl/[-_]release[-_]/_}" # nomad docker images have 'release' in their names
+    repl="${repl/[-_]default[-_]/_}" # consul and vault docker images have 'default' in their names
     repl="${repl/[-_]fips[-_]/_}" # fips word is redundant
     repl="${repl/docker.}" # remove 'docker', it's redundant with '.tar'
     repl="${repl/redhat.}" # remove 'redhat', it's irrelevant for PAO

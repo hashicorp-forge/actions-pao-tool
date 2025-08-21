@@ -152,6 +152,7 @@ ALL_PRODUCTS=(
     "crt-core-helloworld-enterprise-1.0.0+ent.fips1402-1.x86_64.rpm"
     "crt-core-helloworld-enterprise-1.0.0+ent.fips1403-1.x86_64.rpm"
     "crt-core-helloworld-enterprise-1.0.0+ent.fips1403-1.aarch64.rpm"
+    "crt-core-helloworld-enterprise_release-default_linux_arm64_1.0.0+ent_df551a2887ee92c6e3c7a677559cb181ba480c03.docker.dev.tar"
     "nomad-enterprise-1.9.6+ent-1.aarch64.rpm"
     "nomad-enterprise-1.9.6+ent-1.s390x.rpm"
     "nomad-enterprise-1.9.6+ent-1.x86_64.rpm"
