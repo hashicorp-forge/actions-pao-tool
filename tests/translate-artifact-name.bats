@@ -36,6 +36,10 @@ assert_string_absent() {
         assert_string_absent "fips" "$output"
         assert_string_absent "hsm" "$output"
         assert_string_absent "+ent" "$output"
+        assert_string_absent "_-" "$output"
+        assert_string_absent "-_" "$output"
+        assert_string_absent "--" "$output"
+        assert_string_absent "__" "$output"
         assert_success
     done
 }
