@@ -25,6 +25,14 @@ assert_string_absent() {
 }
 
 # bats test_tags=group:translation
+@test "over-length name" {
+    local name="product-name-that-is-longer-than-40-characters_0.0.1_linux_amd64.zip"
+    bats_run -- xlate "$name"
+    assert_line --partial "maximum allowed is"
+    assert_failure
+}
+
+# bats test_tags=group:translation
 @test "all products translation" {
     local product
     for product in "${ALL_PRODUCTS[@]}" ; do
