@@ -34,4 +34,4 @@ be set to s390x for that use case.
 
 | Name         | Description                       | Example                            |
 | ------------ | --------------------------------- | ---------------------------------- |
-| license_path | The path to the license documents | `.release/ibm-pao/license/default` |
+| license-path | The path to the license documents | `.release/ibm-pao/license/default` |
