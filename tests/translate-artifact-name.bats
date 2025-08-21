@@ -8,8 +8,6 @@ bats_require_minimum_version 1.7.0
 # This must be in the current shell, so it cannot be within a bats setup* function.
 eval "$(echo -n 'bats_run()' ; declare -f run | tail -n +2)"
 
-readonly MAX_LENGTH=40
-
 setup() {
     bats_load_library bats-support
     bats_load_library bats-assert
@@ -27,24 +25,30 @@ assert_string_absent() {
 }
 
 # bats test_tags=group:translation
+@test "over-length name" {
+    local name="product-name-that-is-longer-than-40-characters_0.0.1_linux_amd64.zip"
+    bats_run -- xlate "$name"
+    assert_line --partial "maximum allowed is"
+    assert_failure
+}
+
+# bats test_tags=group:translation
 @test "all products translation" {
     local product
     for product in "${ALL_PRODUCTS[@]}" ; do
-        output="$(xlate "$product")"
+        unset output
+        bats_run -- xlate "$product"
         #echo "xlate: [$product] -> [$output]" 1>&3
-        echo "$output" 1>&3
+
         assert_string_absent "terraform-enterprise" "$output"
         assert_string_absent "fips" "$output"
         assert_string_absent "hsm" "$output"
         assert_string_absent "+ent" "$output"
-    done
-}
-
-@test "all products length" {
-    local product
-    for product in "${ALL_PRODUCTS[@]}" ; do
-        output="$(xlate "$product")"
-        assert [ "${#output}" -le $MAX_LENGTH ]
+        assert_string_absent "_-" "$output"
+        assert_string_absent "-_" "$output"
+        assert_string_absent "--" "$output"
+        assert_string_absent "__" "$output"
+        assert_success
     done
 }
 
@@ -160,6 +164,7 @@ ALL_PRODUCTS=(
     "crt-core-helloworld-enterprise-1.0.0+ent.fips1402-1.x86_64.rpm"
     "crt-core-helloworld-enterprise-1.0.0+ent.fips1403-1.x86_64.rpm"
     "crt-core-helloworld-enterprise-1.0.0+ent.fips1403-1.aarch64.rpm"
+    "crt-core-helloworld-enterprise_release-default_linux_arm64_1.0.0+ent_df551a2887ee92c6e3c7a677559cb181ba480c03.docker.dev.tar"
     "nomad-enterprise-1.9.6+ent-1.aarch64.rpm"
     "nomad-enterprise-1.9.6+ent-1.s390x.rpm"
     "nomad-enterprise-1.9.6+ent-1.x86_64.rpm"
