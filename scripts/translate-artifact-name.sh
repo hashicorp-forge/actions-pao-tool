@@ -82,7 +82,8 @@ xlate() {
             ;;
     esac
 
-    if [ "${#repl}" -gt 40 ]; then
+    # .sig files are allowed to exceed MAX_LENGTH because they are not uploaded to PAO
+    if [[ ! "$repl" =~ \.(sig)$ ]] && [ "${#repl}" -gt $MAX_LENGTH ]; then
         echo "${repl}: translated name is ${#repl} characters, maximum allowed is ${MAX_LENGTH}." 1>&2
         return 1
     fi

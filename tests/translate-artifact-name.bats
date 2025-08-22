@@ -264,4 +264,5 @@ ALL_PRODUCTS=(
     "vault_1.19.5+ent.fips1403_linux_arm64.zip"
     "vault_1.19.5+ent.hsm.fips1403_linux_amd64.zip"
     "vault_1.19.5+ent.hsm.fips1403_linux_arm64.zip"
+    "crt-core-helloworld_1.0.0+ent.fips1403_SHA256SUMS.72D7468F.sig"
 )
