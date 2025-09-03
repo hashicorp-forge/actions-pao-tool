@@ -48,6 +48,7 @@ assert_string_absent() {
         assert_string_absent "-_" "$output"
         assert_string_absent "--" "$output"
         assert_string_absent "__" "$output"
+        assert_string_absent "ubi-H_" "$output"
         assert_success
     done
 }
@@ -265,4 +266,6 @@ ALL_PRODUCTS=(
     "vault_1.19.5+ent.hsm.fips1403_linux_amd64.zip"
     "vault_1.19.5+ent.hsm.fips1403_linux_arm64.zip"
     "crt-core-helloworld_1.0.0+ent.fips1403_SHA256SUMS.72D7468F.sig"
+    "vault-enterprise_ubi-hsm-fips_linux_arm64_1.21.0+ent.hsm.fips1403_9c6cecbb7bb5b44fd543a06c248cfa06b824b7d5.docker.tar"
+    "vault-enterprise_ubi-hsm_linux_amd64_1.21.0+ent.hsm_9c6cecbb7bb5b44fd543a06c248cfa06b824b7d5.docker.tar"
 )
