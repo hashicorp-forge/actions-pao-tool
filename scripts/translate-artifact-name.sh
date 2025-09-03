@@ -12,6 +12,7 @@ xlate() {
 
     # transformations
     repl="${repl/+ent}"
+    repl="${repl/ubi-hsm/ubi}" # -hsm in docker image name is redundant
     repl="${repl/.hsm/_H}" # separator included here because hsm is consistently placed before FIPS; but this is brittle
     repl="${repl/.fips1402/_F2}"
     repl="${repl/H_F2/HF2}" # for hsm+fips remove the separator between them
