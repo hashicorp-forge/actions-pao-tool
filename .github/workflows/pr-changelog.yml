@@ -33,11 +33,12 @@ jobs:
             exit 0
           fi
 
-          cat <<'EOF'
+          cat <<'EOF' >&2
           This PR does not include any changelogs nor does it use the `pr/no-changelog` label.
           All changes that effect user-visible behavior require changelogs.  Please add one with
           `changie new`.
           EOF
+          exit 1
 
       - name: Install changie
         uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
