@@ -85,7 +85,7 @@ EOF
 
 main() {
     if ! command -v changie ; then
-        err "This script requires theh changie tool, which was not found in your PATH."
+        err "This script requires the changie tool, which was not found in your PATH."
         return 1
     fi
 
