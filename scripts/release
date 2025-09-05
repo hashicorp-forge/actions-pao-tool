@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "${BASH_SOURCE%/*}/utils.bash"
+
+show_versions() {
+	echo "Current version:" ; changie latest ; echo
+	echo "Next version:" ; changie next auto ; echo
+}
+
+tag_release() {
+    local REPO_ROOT UTCHANGES
+    REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+	git co main
+	git pull --rebase
+    cd "$REPO_ROOT"
+    UTCHANGES="$(git status --short .changes)"
+    if [ -n "$UTCHANGES" ]; then
+        log "$UTCHANGES"
+        err "Untracked changes in .changes/ -- refusing to update changelog for release."
+        return 1
+    fi
+
+    local CUR TAG
+    CUR="$(changie latest)"
+    TAG="$(changie next auto)"
+    log "Current version: $CUR"
+	log "Next version   : $TAG"
+
+	changie batch auto
+	changie merge
+	git add .changes CHANGELOG.md
+	git commit -m "release $TAG"
+
+    local MINOR="${TAG%.*}"
+    local MAJOR="${TAG%%.*}"
+    local t
+    for t in "$TAG" "$MINOR" "$MAJOR" ; do
+        git tag -f "$t"
+    done
+
+    git show
+    log "Updated changelog for release $TAG"
+    log "If these changes look correct, you can push the release with the following command: $0 push_release $TAG"
+}
+
+push_release() {
+    local TAG="${1:-}"
+    if [ -z "$TAG" ]; then
+        TAG="$(changie latest)"
+    fi
+
+    log "Pushing release $TAG"
+
+    local MINOR="${TAG%.*}"
+    local MAJOR="${TAG%%.*}"
+
+    local r
+    for r in "main" "$TAG" "$MINOR" "$MAJOR" ; do
+        git push origin "$r"
+    done
+}
+
+usage() {
+    local me="${0##*/}"
+    cat <<EOF
+Usage:  $me [command]
+
+Commands:
+    push            Push the lasted release tags to origin
+    show-versions   Show the current and next release tags (based on changelog entries)
+                    Note: if there are no entries other than "Notes", there is nothing to
+                    release and changie will emit an error when attempting to determine the
+                    next tag.
+    tag             Update the changelog, then tag a new release using the version determined by changie.
+
+Example:
+    $me show-versions
+    $me tag
+    $me push
+EOF
+}
+
+main() {
+    if ! command -v changie ; then
+        err "This script requires theh changie tool, which was not found in your PATH."
+        return 1
+    fi
+
+    case "$1" in
+        -h|--help)
+            usage
+            return 0
+            ;;
+
+        push) push_release ;;
+        show-versions) show_versions ;;
+        tag) tag_release ;;
+
+        *)
+            usage
+            return 1
+            ;;
+    esac
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

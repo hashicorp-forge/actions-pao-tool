@@ -9,6 +9,6 @@ Tools related to release channel PAO.
 
 ### Release Process
 
-1. Create a new tag at the commit to release.
-   Follow SemVer semantics.
-1. Update dynamic tags (e.g. `v1`) to match the most recent release.
+1. Create a tag: `make release/tag`
+1. If the changes show look correct, push the tag: `make release/push`
+   This will push to main, the just-created tag, and the dynamic tags for the major and minor versions.
