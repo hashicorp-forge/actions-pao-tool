@@ -1,0 +1,86 @@
+name: Check PR Changelog
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+env:
+  COMMENT_HEADER: "## Changelog updates"
+
+jobs:
+  validate-changelog:
+    runs-on: ubuntu-latest
+    name: Validate Changelog
+    if: "!contains(github.event.pull_request.labels.*.name , 'pr/no-changelog')"
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 100 # probably enough for this repo
+
+      - name: Verify Changelog Entry
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+        run: |
+          changes="$(git diff --name-only "$BASE_REF" "$HEAD_REF" -- .changes/ | grep '[.]md$' | grep -v header.tpl.md || true)"
+          if [ -n "$changes" ]; then
+            printf "Found at least one changelog entry:\n%s" "$changes"
+            exit 0
+          fi
+
+          cat <<'EOF' >&2
+          This PR does not include any changelogs nor does it use the `pr/no-changelog` label.
+          All changes that effect user-visible behavior require changelogs.  Please add one with
+          `changie new`.
+          EOF
+          exit 1
+
+      - name: Install changie
+        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
+        with:
+          repo: miniscruff/changie
+          tag: latest
+          cache: false
+
+      - name: Generate Changelog Entry
+        env:
+          BODY_FILE: "${{ runner.temp }}/comment-body"
+          PR_ID: ${{ github.event.pull_request.number }}
+        run: |
+          # Generate the comment body.
+          cat > "$BODY_FILE" <<EOF
+          $COMMENT_HEADER
+
+          The new changelog entry is shown below.
+          Disregard the version number, as it's only a placeholder.
+          Also disregard entries unrelated to your PR, they are shown only for context.
+
+          ----
+
+          EOF
+
+          changie batch patch --dry-run >> "$BODY_FILE" || true
+          echo "Comment body:"
+          cat "$BODY_FILE"
+
+      - name: Find PR Comment
+        id: comment
+        if: env.ACT != 'true' # don't update comments during local testing
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: ${{ env.COMMENT_HEADER }}
+
+      - name: Set PR Comment
+        if: env.ACT != 'true' # don't update comments during local testing
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
+        with:
+          body-path: "${{ runner.temp }}/comment-body"
+          comment-id: ${{ steps.comment.outputs.comment-id }}
+          edit-mode: replace # replace the comment on PR update so it doesn't become huge and confusing
+          issue-number: ${{ github.event.pull_request.number }}
