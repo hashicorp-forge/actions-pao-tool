@@ -11,12 +11,10 @@ branding:
 
 inputs:
   input-dir:
-    type: string
     description: |
       Directory containing artifacts whose names need to be shortened.
     required: true
   output-dir:
-    type: string
     description: |
       Directory where artifacts are written under their short names.
     required: true

@@ -13,15 +13,12 @@ inputs:
   product:
     description: 'The product name (e.g., "vault", "consul", "nomad")'
     required: true
-    type: string
   version:
     description: 'The product version'
     required: true
-    type: string
   pao_meta_file:
     description: 'The path to the PAO meta file'
     required: true
-    type: string
 
 runs:
   using: composite
@@ -34,7 +31,7 @@ runs:
       # Validate the products to require without requiring all products to have multiple SKUs
       # Maybe require Vault to have single CSV with all the part numbers?
       run: |
-        "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh req-files "${{ inputs.pao_meta_file }}" 
+        "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh req-files "${{ inputs.pao_meta_file }}"
     - name: Validate part number CSV
       shell: bash
       env:
@@ -46,5 +43,5 @@ runs:
         unzip "$PAO_META_FILENAME" -d "$tmpdir"
         # "Validate required files" step already checks for the existence of at least one ebom file
         for ebom in "${tmpdir}/v1/eboms/"*.csv; do
-          "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh check-ebom-parts "$ebom" "$PRODUCT" "$VERSION" 
+          "${GITHUB_ACTION_PATH}"/../scripts/verify-required-files.sh check-ebom-parts "$ebom" "$PRODUCT" "$VERSION"
         done

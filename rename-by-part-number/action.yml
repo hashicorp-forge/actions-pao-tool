@@ -13,15 +13,12 @@ inputs:
   pao_meta_dir:
     description: 'The path to the PAO meta directory'
     required: true
-    type: string
   input_dir:
     description: 'The input directory containing the artifacts to rename'
     required: true
-    type: string
   output_dir:
     description: 'The output directory containing the renamed artifacts'
     required: true
-    type: string
 
 runs:
   using: composite
@@ -35,7 +32,7 @@ runs:
         PAO_META_DIR: ${{ inputs.pao_meta_dir }}
         INPUT_DIR: ${{ inputs.input_dir }}
         OUTPUT_DIR: ${{ inputs.output_dir }}
-      run: |  
+      run: |
         # Name the files in the input directory by part-number in the output directory
         "${GITHUB_ACTION_PATH}"/../scripts/rename-by-part-number.sh \
           "$PAO_META_DIR" "$INPUT_DIR" "$OUTPUT_DIR" || {
