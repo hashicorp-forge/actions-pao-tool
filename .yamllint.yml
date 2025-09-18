@@ -1,0 +1,14 @@
+extends: relaxed
+
+rules:
+  line-length: disable
+  comments: disable
+  comments-indentation: disable
+  document-start: disable
+
+  # This rule allows the GitHub Actions `on: ...` block.
+  # It means we don't have to quote the `"on"` key.
+  # For GitHub Actions this is safe because the parser GitHub
+  # uses does not transform the "on" to "true" in keys.
+  truthy:
+    check-keys: false
