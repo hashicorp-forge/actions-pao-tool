@@ -15,12 +15,54 @@ setup() {
     source "${BATS_TEST_DIRNAME}/../scripts/translate-artifact-name.sh"
 }
 
+# Helper to extract a version string from an artifact name
+extract_version_string() {
+    local name="$1"
+
+    # From SemVer.org;
+    # * altered to allow 4th segment in core version (used in some Vault Ent releases)
+    # * altered to use our field delimiters as anchors at beginning and end
+    # * altered for grep compatibility: no \d, no non-capturing groups
+    #
+    # NOTE: this pattern may match more or less than the intended version string, e.g.
+    # * `1.20.4-1.aarch64.` instead of `1.20.4-1` -- because `.` doesn't terminate the prerelease field in SemVer
+    # * `1.0.0-F2` instead of `1.0.0-F2-1` -- because `-` cannot appear in the prerelease field in SemVer
+    # It's good enough for now because it finds the variant tags that are incorrectly placed in the version string.
+    # If this function's use case is generalized, the pattern may need to be altered.
+    local -r VER_REGEX='[-_](0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))?(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?[-_.]'
+
+    local version
+    # Grab version first so we can use it as a delimiter later
+    version="$(grep -oE -- "$VER_REGEX" <<<"$name")"
+    refute [ "$version" = '' ]
+
+    # Remove delimiters
+    version="${version%[-_]}"
+    version="${version#[-_]}"
+
+    echo "$version"
+}
+
 # Check for disallowed strings; case-insensitive
 assert_string_absent() {
     local str="${1@L}" data="${2@L}"
     case "$data" in
         *${str}*) fail "found '${str}'" ;;
         *) return 0 ;;
+    esac
+}
+
+# Check that variant tags like H and F2 are placed after the product name rather than after the version string.
+# This only applies to Linux packages.
+assert_linux_package_variant_placement() {
+    local name="$1"
+
+    local version
+    version="$(extract_version_string "$name")"
+    case "$version" in
+        *-F2*|*-F3*|*-H*)
+            fail "$name: build variant incorrectly embedded in version string rather than after product name."
+            ;;
     esac
 }
 
@@ -91,6 +133,14 @@ assert_string_absent() {
         assert_string_absent "--" "$output"
         assert_string_absent "__" "$output"
         assert_string_absent "ubi-H_" "$output"
+
+        # For Linux packages, check build variant tag placement, too.
+        case "$product" in
+            *.rpm|*.deb)
+                assert_linux_package_variant_placement "$output"
+                ;;
+        esac
+
         assert_success
     done
 }
@@ -310,4 +360,6 @@ ALL_PRODUCTS=(
     "crt-core-helloworld_1.0.0+ent.fips1403_SHA256SUMS.72D7468F.sig"
     "vault-enterprise_ubi-hsm-fips_linux_arm64_1.21.0+ent.hsm.fips1403_9c6cecbb7bb5b44fd543a06c248cfa06b824b7d5.docker.tar"
     "vault-enterprise_ubi-hsm_linux_amd64_1.21.0+ent.hsm_9c6cecbb7bb5b44fd543a06c248cfa06b824b7d5.docker.tar"
+    "consul-enterprise-fips-1.22.0+ent.fips1402-1.aarch64.rpm"
+    "consul-enterprise-fips-1.18.9+ent.fips1402-1.x86_64.rpm"
 )
