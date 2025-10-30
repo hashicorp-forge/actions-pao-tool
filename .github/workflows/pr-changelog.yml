@@ -36,7 +36,7 @@ jobs:
           cat <<'EOF' >&2
           This PR does not include any changelogs nor does it use the `pr/no-changelog` label.
           All changes that effect user-visible behavior require changelogs.  Please add one with
-          `changie new`.
+          `changie new`. You may have to download and install `changie` first locally.
           EOF
           exit 1
 
