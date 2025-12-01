@@ -11,13 +11,11 @@ branding:
 
 inputs:
   archive:
-    type: string
     required: true
     description: |
       The metadata archive to extract.
       This should have been created with the `collect` action.
   output-dir:
-    type: string
     description: |
       Directory in which to extract the archive.
       After extraction, this will contain paths such as v1/eboms/.
@@ -30,9 +28,6 @@ outputs:
       is specified, this will have the same value.  Otherwise a location will
       be generated internally and reported here.
     value: ${{ steps.extract.outputs.output-dir }}
-
-env:
-  PAO_META: crt-pao-meta.zip # Do not change this value.
 
 runs:
   using: composite
