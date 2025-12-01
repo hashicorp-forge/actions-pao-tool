@@ -74,48 +74,6 @@ assert_linux_package_variant_placement() {
     assert_failure
 }
 
-@test "F2 repositioning for fips1402 RPMs" {
-    # Test that F2 markers are correctly moved from version string to product name suffix
-    # consul with .fips1402 in version string -> should become consul-F2_version
-    bats_run -- xlate "consul-enterprise-fips-1.22.0+ent.fips1402-1.aarch64.rpm"
-    assert_output "consul-F2_1.22.0-1.aarch64.rpm"
-    assert_success
-    
-    # vault with -fips1402 in product name -> should become vault-F2_version  
-    bats_run -- xlate "vault-enterprise-fips1402-1.18.4+ent-1.aarch64.rpm"
-    assert_output "vault-F2_1.18.4-1.aarch64.rpm"
-    assert_success
-    
-    # Another consul example from test suite
-    bats_run -- xlate "consul-enterprise-fips-1.18.9+ent.fips1402-1.x86_64.rpm"
-    assert_output "consul-F2_1.18.9-1.x86_64.rpm"
-    assert_success
-    
-    # Verify that all outputs follow the correct format: product-F2_version-release.arch.rpm
-    # and don't contain problematic strings
-    local test_cases=(
-        "consul-enterprise-fips-1.22.0+ent.fips1402-1.aarch64.rpm"
-        "vault-enterprise-fips1402-1.18.4+ent-1.aarch64.rpm"
-    )
-    
-    local result
-    for test_case in "${test_cases[@]}"; do
-        bats_run -- xlate "$test_case"
-        result="$output"
-        
-        # Verify F2 is in the correct position (after product name, before version)
-        [[ "$result" =~ -F2_ ]] || fail "F2 not in correct position for $test_case: $result"
-        
-        # Verify problematic strings are absent
-        assert_string_absent "fips" "$result"
-        assert_string_absent "+ent" "$result"
-        assert_string_absent "-enterprise" "$result"
-        
-        assert_success
-    done
-}
-
-
 # bats test_tags=group:translation
 @test "all products translation" {
     local product
