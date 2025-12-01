@@ -27,7 +27,7 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.sha }}
           BASE_REF: ${{ github.event.pull_request.base.sha }}
         run: |
-          changes="$(git diff --name-only "$BASE_REF" "$HEAD_REF" -- .changes/ | grep '[.]md$' | grep -v header.tpl.md || true)"
+          changes="$(git diff --name-only "$BASE_REF" "$HEAD_REF" -- .changes/ | grep -E '[.](md|yaml)$' | grep -v header.tpl.md || true)"
           if [ -n "$changes" ]; then
             printf "Found at least one changelog entry:\n%s" "$changes"
             exit 0

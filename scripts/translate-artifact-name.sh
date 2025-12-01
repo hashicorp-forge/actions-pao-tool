@@ -58,16 +58,12 @@ xlate() {
     # move F2 embedded in version string to be a suffix of the product name (preceding the version string)
     case "$repl" in
         *_F2-*.rpm)
-            # Extract product name (before first _) and rest (after first _); 
-            # Example: consul_1.22.0_F2-1.aarch64.rpm (after initial translations)
-            # product=consul, rest=1.22.0_F2-1.aarch64.rpm
-            local product="${repl%%_*}"
-            local rest="${repl#*_}"
-            # Remove _F2- and replace with -
-            # rest=1.22.0-1.aarch64.rpm
-            # repl=consul-F2_1.22.0-1.aarch64.rpm
-            rest="${rest/_F2-/-}"
-            repl="${product}-F2_${rest}"
+            # Extract product name (before first dash) and version+rest (from first dash)
+            local product="${repl%%-*}"
+            local version_rest="${repl#*-}"
+            # Remove _F2- from version_rest to get version-release.arch.rpm
+            version_rest="${version_rest/_F2-/-}"
+            repl="${product}-F2_${version_rest}"
             ;;
         *-F2-*.rpm)
             # Extract product name (before -F2) and rest (after -F2-)
