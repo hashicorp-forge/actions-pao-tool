@@ -11,17 +11,17 @@ branding:
 
 inputs:
   product:
+    type: string
     description: 'The product name (e.g., "vault", "consul", "nomad")'
     required: true
-    type: string
   version:
+    type: string
     description: 'The product version'
     required: true
-    type: string
   pao_meta_file:
+    type: string
     description: 'The path to the PAO meta file'
     required: true
-    type: string
 
 runs:
   using: composite
