@@ -27,7 +27,7 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.sha }}
           BASE_REF: ${{ github.event.pull_request.base.sha }}
         run: |
-          changes="$(git diff --name-only "$BASE_REF" "$HEAD_REF" -- .changes/ | grep '[.]md$' | grep -v header.tpl.md || true)"
+          changes="$(git diff --name-only "$BASE_REF" "$HEAD_REF" -- .changes/ | grep -E '[.](md|yaml)$' | grep -v header.tpl.md || true)"
           if [ -n "$changes" ]; then
             printf "Found at least one changelog entry:\n%s" "$changes"
             exit 0
@@ -36,7 +36,7 @@ jobs:
           cat <<'EOF' >&2
           This PR does not include any changelogs nor does it use the `pr/no-changelog` label.
           All changes that effect user-visible behavior require changelogs.  Please add one with
-          `changie new`.
+          `changie new`. You may have to download and install `changie` first locally.
           EOF
           exit 1
 
