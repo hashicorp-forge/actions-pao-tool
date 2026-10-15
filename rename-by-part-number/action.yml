@@ -11,15 +11,12 @@ branding:
 
 inputs:
   pao_meta_dir:
-    type: string
     description: 'The path to the PAO meta directory'
     required: true
   input_dir:
-    type: string
     description: 'The input directory containing the artifacts to rename'
     required: true
   output_dir:
-    type: string
     description: 'The output directory containing the renamed artifacts'
     required: true
 
