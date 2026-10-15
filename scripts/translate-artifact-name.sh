@@ -11,6 +11,12 @@ xlate() {
     repl="$name"
 
     # transformations
+    case "$repl" in
+        vault[_-]*+ent[.]client_*)
+            repl="${repl/+ent[.]client/.cl}"
+            repl="${repl/_client_/_}" # the client edition is already preserved in the version
+            ;;
+    esac
     repl="${repl/+ent}"
     repl="${repl/ubi-hsm/ubi}" # -hsm in docker image name is redundant
     repl="${repl/.hsm/_H}" # separator included here because hsm is consistently placed before FIPS; but this is brittle

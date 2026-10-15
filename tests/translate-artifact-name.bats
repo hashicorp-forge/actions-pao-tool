@@ -103,6 +103,30 @@ assert_linux_package_variant_placement() {
     done
 }
 
+# bats test_tags=group:translation
+@test "vault client edition translation" {
+    local platform
+    for platform in windows_386 linux_arm64 aix_ppc64 linux_s390x windows_amd64 linux_amd64 linux_ppc64le ; do
+        bats_run -- xlate "vault_2.2.0+ent.client_${platform}.zip"
+        assert_success
+        assert_output "vault_2.2.0.cl_${platform}.zip"
+    done
+
+    bats_run -- xlate "consul_2.2.0+ent.client_linux_amd64.zip"
+    assert_success
+    assert_output "consul_2.2.0.client_linux_amd64.zip"
+}
+
+# bats test_tags=group:translation
+@test "vault client Docker artifact translation" {
+    local arch
+    for arch in amd64 arm64 ppc64le s390x ; do
+        bats_run -- xlate "vault-enterprise_client_linux_${arch}_2.2.0+ent.client_a7b6963bc01c138f0b8e24163597817234b8d517.docker.tar"
+        assert_success
+        assert_output "vault_linux_${arch}_2.2.0.cl.tar"
+    done
+}
+
 ALL_PRODUCTS=(
     "boundary_0.19.0+ent_darwin_amd64.zip"
     "boundary_0.19.0+ent_darwin_arm64.zip"
@@ -320,4 +344,15 @@ ALL_PRODUCTS=(
     "vault-enterprise_ubi-hsm_linux_amd64_1.21.0+ent.hsm_9c6cecbb7bb5b44fd543a06c248cfa06b824b7d5.docker.tar"
     "consul-enterprise-fips-1.22.0+ent.fips1402-1.aarch64.rpm"
     "consul-enterprise-fips-1.18.9+ent.fips1402-1.x86_64.rpm"
+    "vault_2.2.0+ent.client_windows_386.zip"
+    "vault_2.2.0+ent.client_linux_arm64.zip"
+    "vault_2.2.0+ent.client_aix_ppc64.zip"
+    "vault_2.2.0+ent.client_linux_s390x.zip"
+    "vault_2.2.0+ent.client_windows_amd64.zip"
+    "vault_2.2.0+ent.client_linux_amd64.zip"
+    "vault_2.2.0+ent.client_linux_ppc64le.zip"
+    "vault-enterprise_client_linux_amd64_2.2.0+ent.client_a7b6963bc01c138f0b8e24163597817234b8d517.docker.tar"
+    "vault-enterprise_client_linux_arm64_2.2.0+ent.client_a7b6963bc01c138f0b8e24163597817234b8d517.docker.tar"
+    "vault-enterprise_client_linux_ppc64le_2.2.0+ent.client_a7b6963bc01c138f0b8e24163597817234b8d517.docker.tar"
+    "vault-enterprise_client_linux_s390x_2.2.0+ent.client_a7b6963bc01c138f0b8e24163597817234b8d517.docker.tar"
 )
