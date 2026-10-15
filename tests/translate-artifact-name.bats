@@ -109,7 +109,7 @@ assert_linux_package_variant_placement() {
     for platform in windows_386 linux_arm64 aix_ppc64 linux_s390x windows_amd64 linux_amd64 linux_ppc64le ; do
         bats_run -- xlate "vault_2.2.0+ent.client_${platform}.zip"
         assert_success
-        assert_output "vault_2.2.0.cl_${platform}.zip"
+        assert_output "vault_2.2.0.client_${platform}.zip"
     done
 
     bats_run -- xlate "consul_2.2.0+ent.client_linux_amd64.zip"
@@ -123,7 +123,7 @@ assert_linux_package_variant_placement() {
     for arch in amd64 arm64 ppc64le s390x ; do
         bats_run -- xlate "vault-enterprise_client_linux_${arch}_2.2.0+ent.client_a7b6963bc01c138f0b8e24163597817234b8d517.docker.tar"
         assert_success
-        assert_output "vault_linux_${arch}_2.2.0.cl.tar"
+        assert_output "vault_linux_${arch}_2.2.0.client.tar"
     done
 }
 
